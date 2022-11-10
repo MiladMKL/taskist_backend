@@ -1,3 +1,5 @@
+app.use(express.static("build"))
+
 // Import
 const express = require("express")
 const app = express()
@@ -5,8 +7,6 @@ const app = express()
 // Allow for requests from all origins
 const cors = require("cors")
 app.use(cors())
-
-app.use(express.static("build"))
 
 // Without this the body would be undefined
 app.use(express.json())
