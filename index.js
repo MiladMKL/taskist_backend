@@ -1,5 +1,3 @@
-app.use(express.static("build"))
-
 // Import
 const express = require("express")
 const app = express()
@@ -10,6 +8,8 @@ app.use(cors())
 
 // Without this the body would be undefined
 app.use(express.json())
+
+app.use(express.static("build"))
 
 let tasks = [
 	{
