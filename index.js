@@ -1,32 +1,69 @@
 // Import
-const http = require("http")
+const express = require("express")
+const app = express()
 
-let notes = [
+// Allow for requests from all origins
+const cors = require("cors")
+app.use(cors())
+
+// Without this the body would be undefined
+app.use(express.json())
+
+let tasks = [
 	{
 		id: 1,
-		content: "HTML is easy",
+		title: "learn HTML",
 		date: "2022-05-30T17:30:31.098Z",
-		important: true,
+		completed: true,
 	},
 	{
 		id: 2,
-		content: "Browser can execute only Javascript",
+		title: "learn Javascript",
 		date: "2022-05-30T18:39:34.091Z",
-		important: false,
+		completed: false,
 	},
 	{
 		id: 3,
-		content: "GET and POST are the most important methods of HTTP protocol",
+		title: "learn React Native",
 		date: "2022-05-30T19:20:14.298Z",
-		important: true,
+		completed: true,
 	},
 ]
 
-const app = http.createServer((request, response) => {
-	response.writeHead(200, { "Content-Type": "application/json" })
-	response.end(JSON.stringify(notes))
+app.get("/", (request, response) => {
+	response.send("<h1>Welcome!</h1>")
 })
 
-const PORT = 3001
-app.listen(PORT)
-console.log(`Server running on port ${PORT}`)
+app.get("/api/tasks", (request, response) => {
+	response.json(tasks)
+})
+
+app.get("/api/tasks/:id", (request, response) => {
+	const id = Number(request.params.id)
+	const task = tasks.find((task) => task.id === id)
+
+	if (task) {
+		response.json(task)
+	} else {
+		response.status(404).json({ message: "Task not found" })
+	}
+})
+
+app.delete("/api/tasks/:id", (request, response) => {
+	const id = Number(request.params.id)
+	tasks = tasks.filter((task) => task.id !== id)
+
+	response.status(204).end()
+})
+
+app.post("/api/tasks", (request, response) => {
+	const task = request.body
+	console.log(task)
+	response.json(task)
+})
+
+// Use environment variable PORT or PORT 3001 if not specified
+const PORT = process.env.PORT || 3001
+app.listen(PORT, () => {
+	console.log(`Server running on port ${PORT}`)
+})
