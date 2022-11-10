@@ -6,7 +6,7 @@ const app = express()
 const cors = require("cors")
 app.use(cors())
 
-app.use(express.static('build'))
+app.use(express.static("build"))
 
 // Without this the body would be undefined
 app.use(express.json())
@@ -32,9 +32,9 @@ let tasks = [
 	},
 ]
 
-app.get("/", (request, response) => {
-	response.send("<h1>Welcome!</h1>")
-})
+// app.get("/", (request, response) => {
+// 	response.send("<h1>Welcome!</h1>")
+// })
 
 app.get("/api/tasks", (request, response) => {
 	response.json(tasks)
