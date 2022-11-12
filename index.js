@@ -23,6 +23,10 @@ app.use(express.static('build'))
 /* --------------------------------
  * Routes
  * -------------------------------- */
+app.get('*', (request, response) => {
+	response.sendFile(path.join(__dirname, 'build', 'index.html'))
+})
+
 app.get('/api/tasks', (request, response) => {
 	Task.find({}).then((tasks) => {
 		response.json(tasks)
