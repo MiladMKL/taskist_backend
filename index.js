@@ -23,10 +23,6 @@ app.use(express.static('build'))
 /* --------------------------------
  * Routes
  * -------------------------------- */
-app.get('/', (request, response) => {
-	response.send('<h1>Hello, World!</h1>')
-})
-
 app.get('/api/tasks', (request, response) => {
 	Task.find({}).then((tasks) => {
 		response.json(tasks)
