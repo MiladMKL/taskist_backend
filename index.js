@@ -24,7 +24,7 @@ app.use(express.static('build'))
  * Routes
  * -------------------------------- */
 app.get('*', (request, response) => {
-	response.sendFile(path.join(__dirname, 'build', 'index.html'))
+	res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'))
 })
 
 app.get('/api/tasks', (request, response) => {
@@ -112,5 +112,6 @@ app.listen(PORT, () => {
 })
 
 if (process.env.NODE_ENV === 'production') {
-	app.use(express.static('build'))
+	//set static folder
+	app.use(express.static('client/build'))
 }
