@@ -8,7 +8,6 @@ if (process.argv.length < 3) {
 }
 
 const password = process.argv[2]
-// 11RitterRammtSchwert
 const url = `mongodb+srv://dalimmkl:${password}@cluster0.9auw1.mongodb.net/fullstackTaskistClone?retryWrites=true&w=majority`
 
 const taskSchema = new mongoose.Schema({

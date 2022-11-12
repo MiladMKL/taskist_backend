@@ -1,70 +1,112 @@
-// Import
-const express = require("express")
+const express = require('express')
 const app = express()
+const cors = require('cors')
+require('dotenv').config()
+const Task = require('./models/task')
 
-// Allow for requests from all origins
-const cors = require("cors")
-app.use(cors())
-app.use(express.static("build"))
+const requestLogger = (request, response, next) => {
+	console.log('Method:', request.method)
+	console.log('Path:  ', request.path)
+	console.log('Body:  ', request.body)
+	console.log('---')
+	next()
+}
 
 // Without this the body would be undefined
 app.use(express.json())
 
-let tasks = [
-	{
-		id: 1,
-		title: "learn HTML",
-		date: "2022-05-30T17:30:31.098Z",
-		completed: true,
-	},
-	{
-		id: 2,
-		title: "learn Javascript",
-		date: "2022-05-30T18:39:34.091Z",
-		completed: false,
-	},
-	{
-		id: 3,
-		title: "learn React Native",
-		date: "2022-05-30T19:20:14.298Z",
-		completed: true,
-	},
-]
+app.use(requestLogger)
 
-// app.get("/", (request, response) => {
-// 	response.send("<h1>Welcome!</h1>")
-// })
+app.use(cors())
+app.use(express.static('build'))
 
-app.get("/api/tasks", (request, response) => {
-	response.json(tasks)
+/* --------------------------------
+ * Routes
+ * -------------------------------- */
+app.get('/', (request, response) => {
+	response.send('<h1>Hello, World!</h1>')
 })
 
-app.get("/api/tasks/:id", (request, response) => {
-	const id = Number(request.params.id)
-	const task = tasks.find((task) => task.id === id)
+app.get('/api/tasks', (request, response) => {
+	Task.find({}).then((tasks) => {
+		response.json(tasks)
+	})
+})
 
-	if (task) {
-		response.json(task)
-	} else {
-		response.status(404).json({ message: "Task not found" })
+app.get('/api/tasks/:id', (request, response, next) => {
+	Task.findById(request.params.id)
+		.then((task) => {
+			if (task) {
+				response.json(task)
+			} else {
+				response.status(404).end()
+			}
+		})
+		.catch((error) => {
+			next(error)
+		})
+})
+
+app.post('/api/tasks', (request, response) => {
+	const body = request.body
+
+	if (body.title === undefined) {
+		return response.status(400).json({ message: 'Title is required' })
 	}
+
+	const task = new Task({
+		title: body.title,
+		completed: body.completed || false,
+		date: new Date(),
+	})
+
+	task.save().then((savedTask) => {
+		response.json(savedTask)
+	})
 })
 
-app.delete("/api/tasks/:id", (request, response) => {
-	const id = Number(request.params.id)
-	tasks = tasks.filter((task) => task.id !== id)
-
-	response.status(204).end()
+app.delete('/api/tasks/:id', (request, response, next) => {
+	Task.findByIdAndRemove(request.params.id)
+		.then((result) => {
+			response.status(204).end()
+		})
+		.catch((error) => next(error))
 })
 
-app.post("/api/tasks", (request, response) => {
-	const task = request.body
-	console.log(task)
-	response.json(task)
+app.put('/api/tasks/:id', (request, response, next) => {
+	const body = request.body
+
+	const task = {
+		title: body.title,
+		completed: body.completed || false,
+	}
+
+	Task.findByIdAndUpdate(request.params.id, task, { new: true })
+		.then((updatedTask) => {
+			response.json(updatedTask)
+		})
+		.catch((error) => next(error))
 })
 
-// Use environment variable PORT or PORT 3001 if not specified
-const PORT = process.env.PORT || 3001
+const unknownEndpoint = (request, response) => {
+	response.status(404).send({ error: 'unknown endpoint' })
+}
+
+app.use(unknownEndpoint)
+
+const errorHandler = (error, request, response, next) => {
+	console.error(error.message)
+
+	if (error.name === 'CastError') {
+		return response.status(400).send({ error: 'malformatted id' })
+	}
+
+	next(error)
+}
+
+app.use(errorHandler)
+
+const PORT = process.env.PORT
 app.listen(PORT, () => {
 	console.log(`Server running on port ${PORT}`)
 })
