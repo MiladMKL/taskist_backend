@@ -1,17 +1,4 @@
-const mongoose = require("mongoose")
-
-const url = process.env.MONGODB_URI
-
-console.log("connecting to", url)
-
-mongoose
-	.connect(url)
-	.then((result) => {
-		console.log("connected to MongoDB")
-	})
-	.catch((error) => {
-		console.log("error connecting to MongoDB:", error.message)
-	})
+const mongoose = require('mongoose')
 
 const taskSchema = new mongoose.Schema({
 	title: {
@@ -20,10 +7,14 @@ const taskSchema = new mongoose.Schema({
 	},
 	date: Date,
 	completed: Boolean,
+	user: {
+		type: mongoose.Schema.Types.ObjectId,
+		ref: 'User',
+	},
 })
 
 // delete _v (mongo versioning field) variable from this collection
-taskSchema.set("toJSON", {
+taskSchema.set('toJSON', {
 	transform: (document, returnedObject) => {
 		returnedObject.id = returnedObject._id.toString()
 		delete returnedObject._id
@@ -31,4 +22,4 @@ taskSchema.set("toJSON", {
 	},
 })
 
-module.exports = mongoose.model("Task", taskSchema)
+module.exports = mongoose.model('Task', taskSchema)

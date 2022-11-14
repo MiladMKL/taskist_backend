@@ -5,3 +5,14 @@ Content-Type: application/json
   "title": "VS Code Rest client is awesome",
   "completed": false
 }
+
+###
+
+POST http://localhost:3001/api/tasks
+Content-Type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1pbGFkIiwiaWQiOiI2MzcyNGZjMzE1NjIxODE5OGM0NTFkYTMiLCJpYXQiOjE2Njg0NDA2MDF9.xpnE4-2BqgciPyx1VVL6VPzwZhTxkbnfkTVFbedb3w8
+
+{
+  "title": "This task was added with Token",
+  "completed": false
+}
